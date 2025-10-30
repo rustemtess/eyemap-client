@@ -44,7 +44,7 @@ export default function LoginPage() {
         onSubmit={fetchLogin}
         className="flex flex-col gap-2 p-4 max-w-[320px] w-full flex flex-col items-center"
       >
-        <img src={logo} width={100} />
+        <img src={logo} width={80} className="my-2" />
         <input
           className="w-full bg-white p-3 px-5 rounded-full text-sm"
           placeholder="Введите электронную почту"

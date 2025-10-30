@@ -5,11 +5,13 @@ export interface IDrug {
 
 export interface Application {
   id: number;
-  photo: string;
+  address: string;
+  photo?: string;
   description: string;
   datetime: string;
-  verified: "Подтверждено" | "Отклонено" | "В ожидании";
+  verified: string;
   drugType: string;
+  coordinates: [number, number]; // <--- добавь координаты
 }
 
 
