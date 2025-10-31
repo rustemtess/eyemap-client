@@ -30,12 +30,14 @@ interface KazakhstanMapProps {
   regionName: string;
   applications: Application[];
   initialCoords?: [number, number];
+  isAdmin: boolean;
 }
 
 const KazakhstanRegionMap: React.FC<KazakhstanMapProps> = ({
   regionName,
   applications,
-  initialCoords
+  initialCoords,
+  isAdmin = true
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -93,24 +95,26 @@ const KazakhstanRegionMap: React.FC<KazakhstanMapProps> = ({
       });
 
       // Источник для точек
+      const filteredApplications = applications
+        .filter((app) => isAdmin || app.verified === "Подтверждено")
+        .filter((app) => booleanPointInPolygon(point(app.coordinates), regionPolygon));
+
       map.addSource("applications", {
         type: "geojson",
         data: {
           type: "FeatureCollection",
-          features: applications
-            .filter((app) => booleanPointInPolygon(point(app.coordinates), regionPolygon))
-            .map((app) => ({
-              type: "Feature",
-              geometry: { type: "Point", coordinates: app.coordinates },
-              properties: {
-                id: app.id,
-                address: app.address,
-                description: app.description,
-                datetime: app.datetime,
-                verified: app.verified,
-                drugType: app.drugType
-              }
-            }))
+          features: filteredApplications.map((app) => ({
+            type: "Feature",
+            geometry: { type: "Point", coordinates: app.coordinates },
+            properties: {
+              id: app.id,
+              address: app.address,
+              description: app.description,
+              datetime: app.datetime,
+              verified: app.verified,
+              drugType: app.drugType
+            }
+          }))
         },
         cluster: true,
         clusterMaxZoom: 12,
@@ -168,12 +172,17 @@ const KazakhstanRegionMap: React.FC<KazakhstanMapProps> = ({
         }
       });
 
-      // Попапы
+      // Popup
       map.on("click", "unclustered-point", (e) => {
         const feature = e.features?.[0];
         if (!feature || feature.geometry.type !== "Point") return;
-        const coords = feature.geometry.coordinates as [number, number];
+
         const { drugType, description, datetime, verified, address } = feature.properties as any;
+
+        const coords = feature.geometry.coordinates as [number, number];
+
+        // Для обычных показываем только Подтверждено
+        if (!isAdmin && verified !== "Подтверждено") return;
 
         new maplibregl.Popup({ offset: 10 })
           .setLngLat(coords)
@@ -182,14 +191,14 @@ const KazakhstanRegionMap: React.FC<KazakhstanMapProps> = ({
               <b>${drugType}</b><br/>
               ${description}<br/>
               <small>${address}</small><br/>
-              <small>${datetime}</small><br/>
-              <span style="color:${
+              ${isAdmin ? `<small>${datetime}</small><br/>` : ''}
+              ${isAdmin ? `<span style="color:${
                 verified === "Подтверждено"
                   ? "green"
                   : verified === "Отклонено"
                   ? "red"
                   : "orange"
-              }">${verified}</span>
+              }">${verified}</span>` : ''}
             </div>
           `)
           .addTo(map);
@@ -214,7 +223,7 @@ const KazakhstanRegionMap: React.FC<KazakhstanMapProps> = ({
       map.on("mouseenter", "clusters", () => (map.getCanvas().style.cursor = "pointer"));
       map.on("mouseleave", "clusters", () => (map.getCanvas().style.cursor = ""));
 
-      // === Центрируем только если нет initialCoords ===
+      // Центрируем если нет initialCoords
       if (!initialCoords) {
         map.fitBounds(bounds, { padding: 40, maxZoom: 6 });
       }
@@ -257,10 +266,8 @@ const KazakhstanRegionMap: React.FC<KazakhstanMapProps> = ({
     const maskSource = map.getSource("mask") as maplibregl.GeoJSONSource;
     maskSource?.setData(maskData);
 
-    // Центрируем с анимацией
     map.fitBounds(bounds, { padding: 40, maxZoom: 6, animate: false });
-map.setMaxBounds(bounds);
-
+    map.setMaxBounds(bounds);
   }, [regionName]);
 
   // === Обновление точек ===
@@ -272,9 +279,10 @@ map.setMaxBounds(bounds);
     if (!region || !source) return;
 
     const regionPolygon = polygon(region.geometry.coordinates);
-    const filteredApplications = applications.filter((app) =>
-      booleanPointInPolygon(point(app.coordinates), regionPolygon)
-    );
+
+    const filteredApplications = applications
+      .filter((app) => isAdmin || app.verified === "Подтверждено")
+      .filter((app) => booleanPointInPolygon(point(app.coordinates), regionPolygon));
 
     source.setData({
       type: "FeatureCollection",
@@ -291,7 +299,7 @@ map.setMaxBounds(bounds);
         }
       }))
     });
-  }, [applications, regionName]);
+  }, [applications, regionName, isAdmin]);
 
   return <div ref={mapContainer} className="w-full h-full" />;
 };

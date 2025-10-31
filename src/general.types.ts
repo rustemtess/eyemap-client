@@ -29,3 +29,21 @@ export const drugTypes: IDrug[] = [
         color: "#fb2b37"
     }
 ];
+
+export const regions: string[] = [
+    "Abai", 
+    "Aktobe", 
+    "Almaty", 
+    "West Kazakhstan", 
+    "Jambyl", 
+    "Jetisu", 
+    "Karaganda", 
+    "Kostanay", 
+    "Kyzylorda", 
+    "Pavlodar", 
+    "North Kazakhstan", 
+    "Turkestan", 
+    "Ulytau", 
+    "East Kazakhstan", 
+    "Shymkent (city)"
+];
