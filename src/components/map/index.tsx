@@ -56,7 +56,7 @@ const KazakhstanRegionMap: React.FC<KazakhstanMapProps> = ({
 
     const map = new maplibregl.Map({
       container: mapContainer.current,
-      style: "https://tiles.stadiamaps.com/styles/alidade_satellite.json",
+      style: "https://tiles.stadiamaps.com/styles/alidade_satellite.json?api_key=bf38bb82-2815-4178-b01b-bdbef8109fe9",
       center: initialCoords || [83.0, 48.5],
       zoom: initialCoords ? 14 : 5.5,
       minZoom: 4,
