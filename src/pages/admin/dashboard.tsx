@@ -3,7 +3,7 @@ import Pagination from "../../components/Pagination";
 import Chart from "react-apexcharts";
 import { drugTypes, type Application } from "../../general.types";
 import type { ApexOptions } from "apexcharts";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 
 interface IDashboardPage {
   applications: Application[]
@@ -12,7 +12,7 @@ interface IDashboardPage {
 export default function DashboardPage(
   { applications }: IDashboardPage
 ) {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   // const goToMap = (coordinates: [number, number]) => {
   //   const [lng, lat] = coordinates;
