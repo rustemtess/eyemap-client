@@ -14,10 +14,10 @@ export default function DashboardPage(
 ) {
   const navigate = useNavigate();
 
-  const goToMap = (coordinates: [number, number]) => {
-    const [lng, lat] = coordinates;
-    navigate(`/admin/map?lng=${lng}&lat=${lat}`);
-  };
+  // const goToMap = (coordinates: [number, number]) => {
+  //   const [lng, lat] = coordinates;
+  //   navigate(`/admin/map?lng=${lng}&lat=${lat}`);
+  // };
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedDrug, setSelectedDrug] = useState<string>("");
